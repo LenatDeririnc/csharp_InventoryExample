@@ -7,46 +7,54 @@ public class BaseContainer
 {
     private readonly Dictionary<Type, BaseInventoryObject> _inventoryObjects = new Dictionary<Type, BaseInventoryObject>();
 
-    public void Add<T>(int count, out int returnCount) where T : BaseInventoryObject, new()
+    public T? Add<T>(int count) where T : BaseInventoryObject, new()
     {
+        if (count <= 0)
+            return null;
+        
         Type type = typeof(T);
-        returnCount = 0;
         
         if (_inventoryObjects.TryGetValue(type, out BaseInventoryObject? element)) {
-            var prevCount = element.Count;
             element.Count += count;
-            returnCount = element.Count - count;
         }
         else {
             _inventoryObjects[type] = new T();
             _inventoryObjects[type].Count = count;
-            returnCount = _inventoryObjects[type].Count - count;
         }
+
+        return (T) _inventoryObjects[type];
     }
 
-    public void Remove<T>(int count) where T : BaseInventoryObject
+    public T? Remove<T>(int count) where T : BaseInventoryObject
     {
         Type type = typeof(T);
+        
+        if (count <= 0)
+            return (T) _inventoryObjects[type];
 
         if (_inventoryObjects.TryGetValue(type, out BaseInventoryObject? element)) {
             element.Count -= count;
-            if (element.Count <= 0) {
-                _inventoryObjects.Remove(type);
-            }
-            
-            return;
+
+            if (element.Count > 0)
+                return (T)_inventoryObjects[type];
+
+            _inventoryObjects.Remove(type);
+            return null;
+
         }
 
         Console.WriteLine($"[WARNING] Can't remove object with type \"{type}\". This object type doesn't exist on this container.");
-        return;
-
+        return (T) _inventoryObjects[type];
     }
 
-    public T Get<T>() where T : BaseInventoryObject
+    public T? Get<T>() where T : BaseInventoryObject
     {
         Type type = typeof(T);
-        T retVal = _inventoryObjects[type] as T ?? throw new InvalidOperationException();
-        return retVal;
+
+        if (!_inventoryObjects.TryGetValue(type, out BaseInventoryObject? value))
+            return null;
+        
+        return (T) value;
     }
 
     public string PrintInfo()

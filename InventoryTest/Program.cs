@@ -10,15 +10,15 @@ public class Program
         BaseContainer Table = new BaseContainer();
         BaseContainer Inventory = new BaseContainer();
         
-        Table.Add<Amulet>(1, out _);
-        Table.Add<Money>(33, out _);
-        Table.Add<Book>(1, out _);
+        Table.Add<Amulet>(1);
+        Table.Add<Money>(33);
+        Table.Add<Book>(1);
         
         Console.WriteLine(Table.PrintInfo());
         Console.WriteLine("---------");
         Console.WriteLine();
         
-        ContainerOperations.Move<Money>(ref Table, ref Inventory, 33);
+        ContainerOperations.Move<Money>(Table, Inventory, 33);
         
         Console.WriteLine(Table.PrintInfo());
         Console.WriteLine(Inventory.PrintInfo());
